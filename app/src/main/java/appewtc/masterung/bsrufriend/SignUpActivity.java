@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -14,6 +15,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
+
+import org.jibble.simpleftp.SimpleFTP;
+
+import java.io.File;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -25,6 +30,7 @@ public class SignUpActivity extends AppCompatActivity {
     private String nameString, userString, passString,pathImageString,nameImageString;
     private Uri uri;
     private boolean aBoolean = true;
+    private int anInt = 0;
 
 
     @Override
@@ -41,9 +47,40 @@ public class SignUpActivity extends AppCompatActivity {
         //image controller
         imageController();
 
-
+        //radio controller
+        radioController();
+        
+        
     }   // Main Method
 
+    private void radioController() {
+
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+
+                switch (i) {
+                    case R.id.radioButton:
+                        anInt = 0;
+                        break;
+                    case R.id.radioButton2:
+                        anInt = 1;
+                        break;
+                    case R.id.radioButton3:
+                        anInt = 2;
+                        break;
+                    case R.id.radioButton4:
+                        anInt = 3;
+                        break;
+                    case R.id.radioButton5:
+                        anInt = 4;
+                        break;
+                }   // switch
+
+            }   // onChecked
+        });
+
+    }   // radioController
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -113,7 +150,8 @@ public class SignUpActivity extends AppCompatActivity {
                         myAlert.myDialog("ยังไม่เลือกรูปภาพ", "กรุณาเลือกรูปภาพ");
                     } else {
                         // everything ok
-
+                    
+                    uploadValueToServer();
 
                 }
 
@@ -121,6 +159,28 @@ public class SignUpActivity extends AppCompatActivity {
         });
 
     }   // buttonController
+
+    private void uploadValueToServer() {
+
+        try {
+            //Upload image
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy
+                    .Builder()
+                    .permitAll()
+                    .build();
+            StrictMode.setThreadPolicy(policy);
+
+            SimpleFTP simpleFTP = new SimpleFTP();
+            simpleFTP.connect("ftp.swiftcodingthai.com",21,"bsru@swiftcodingthai.com","Abc12345");
+            simpleFTP.bin();
+            simpleFTP.cwd("image_pattanan");
+            simpleFTP.stor(new File(pathImageString));
+            simpleFTP.disconnect();
+
+        } catch (Exception e) {
+            Log.d("10febv1", "e upload ==>" + e.toString());
+        }
+    } // upload
 
     private void bindWidget() {
 
